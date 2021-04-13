@@ -21,7 +21,7 @@ class MAvatar(QLabel):
         dayu_size: the size of image.
     """
 
-    def __init__(self, parent=None, flags=0):
+    def __init__(self, parent=None, flags=Qt.Widget):
         super(MAvatar, self).__init__(parent, flags)
         self._default_pix = MPixmap('user_fill.svg')
         self._pixmap = self._default_pix
@@ -52,8 +52,8 @@ class MAvatar(QLabel):
         """
         if value is None:
             self._pixmap = self._default_pix
-        elif isinstance(value, QPixmap) and (not value.isNull()):
-            self._pixmap = value
+        elif isinstance(value, QPixmap):
+            self._pixmap = self._default_pix if value.isNull() else value
         else:
             raise TypeError("Input argument 'value' should be QPixmap or None, "
                             "but get {}".format(type(value)))

@@ -14,14 +14,15 @@ MDragFileButton, MDragFolderButton
 Browser files or folders by dragging.
 """
 import os
+import six
 
 from dayu_widgets.mixin import property_mixin, cursor_mixin
 from dayu_widgets.push_button import MPushButton
-from dayu_widgets.qt import QFileDialog, Slot, Signal, QSize, QSizePolicy, Property
+from dayu_widgets.qt import QFileDialog, Signal, QSize, QSizePolicy, Property
 from dayu_widgets.tool_button import MToolButton
 
-
-@Slot()
+# NOTE PySide2 Crash without QObject wrapper
+# @Slot()
 def _slot_browser_file(self):
     filter_list = 'File(%s)' % (' '.join(['*' + e for e in self.get_dayu_filters()])) \
         if self.get_dayu_filters() else 'Any File(*)'
@@ -39,7 +40,7 @@ def _slot_browser_file(self):
             self.set_dayu_path(r_file)
 
 
-@Slot()
+# @Slot()
 def _slot_browser_folder(self):
     r_folder = QFileDialog.getExistingDirectory(self, 'Browser Folder', self.get_dayu_path())
     if r_folder:
@@ -48,6 +49,17 @@ def _slot_browser_folder(self):
         else:
             self.sig_folder_changed.emit(r_folder)
         self.set_dayu_path(r_folder)
+
+
+# @Slot()
+def _slot_save_file(self):
+    filter_list = 'File(%s)' % (' '.join(['*' + e for e in self.get_dayu_filters()])) \
+        if self.get_dayu_filters() else 'Any File(*)'
+    r_file, _ = QFileDialog.getSaveFileName(self, 'Save File', self.get_dayu_path(),
+                                            filter_list)
+    if r_file:
+        self.sig_file_changed.emit(r_file)
+        self.set_dayu_path(r_file)
 
 
 class MClickBrowserFilePushButton(MPushButton):
@@ -112,7 +124,7 @@ class MClickBrowserFilePushButton(MPushButton):
         self._multiple = value
 
     dayu_multiple = Property(bool, get_dayu_multiple, set_dayu_multiple)
-    dayu_path = Property(basestring, get_dayu_path, set_dayu_path)
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
     dayu_filters = Property(list, get_dayu_filters, set_dayu_filters)
 
 
@@ -179,7 +191,57 @@ class MClickBrowserFileToolButton(MToolButton):
         self._multiple = value
 
     dayu_multiple = Property(bool, get_dayu_multiple, set_dayu_multiple)
-    dayu_path = Property(basestring, get_dayu_path, set_dayu_path)
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
+    dayu_filters = Property(list, get_dayu_filters, set_dayu_filters)
+
+
+class MClickSaveFileToolButton(MToolButton):
+    """A Clickable tool button to browser files"""
+    sig_file_changed = Signal(str)
+    slot_browser_file = _slot_save_file
+
+    def __init__(self, multiple=False, parent=None):
+        super(MClickSaveFileToolButton, self).__init__(parent=parent)
+        self.set_dayu_svg('save_line.svg')
+        self.icon_only()
+        self.clicked.connect(self.slot_browser_file)
+        self.setToolTip(self.tr('Click to save file'))
+
+        self._path = None
+        self._multiple = multiple
+        self._filters = []
+
+    def get_dayu_filters(self):
+        """
+        Get browser's format filters
+        :return: list
+        """
+        return self._filters
+
+    def set_dayu_filters(self, value):
+        """
+        Set browser file format filters
+        :param value:
+        :return: None
+        """
+        self._filters = value
+
+    def get_dayu_path(self):
+        """
+        Get last browser file path
+        :return: str
+        """
+        return self._path
+
+    def set_dayu_path(self, value):
+        """
+        Set browser file start path
+        :param value: str
+        :return: None
+        """
+        self._path = value
+
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
     dayu_filters = Property(list, get_dayu_filters, set_dayu_filters)
 
 
@@ -254,7 +316,7 @@ class MDragFileButton(MToolButton):
         self._multiple = value
 
     dayu_multiple = Property(bool, get_dayu_multiple, set_dayu_multiple)
-    dayu_path = Property(basestring, get_dayu_path, set_dayu_path)
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
     dayu_filters = Property(list, get_dayu_filters, set_dayu_filters)
 
     def dragEnterEvent(self, event):
@@ -293,8 +355,8 @@ class MDragFileButton(MToolButton):
                 sub_process.wait()
 
             if os.path.isfile(file_name):
-                if self.property('format'):
-                    if os.path.splitext(file_name)[-1] in self.property('format'):
+                if self.get_dayu_filters():
+                    if os.path.splitext(file_name)[-1] in self.get_dayu_filters():
                         file_list.append(file_name)
                 else:
                     file_list.append(file_name)
@@ -348,7 +410,7 @@ class MClickBrowserFolderPushButton(MPushButton):
         self._multiple = value
 
     dayu_multiple = Property(bool, get_dayu_multiple, set_dayu_multiple)
-    dayu_path = Property(basestring, get_dayu_path, set_dayu_path)
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
 
 
 @property_mixin
@@ -400,7 +462,7 @@ class MClickBrowserFolderToolButton(MToolButton):
         self._multiple = value
 
     dayu_multiple = Property(bool, get_dayu_multiple, set_dayu_multiple)
-    dayu_path = Property(basestring, get_dayu_path, set_dayu_path)
+    dayu_path = Property(six.string_types[0], get_dayu_path, set_dayu_path)
 
 
 @property_mixin

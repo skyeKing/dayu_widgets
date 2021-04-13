@@ -8,10 +8,12 @@
 """MLineEdit
 Get the user input is a text field
 """
+import six
 import functools
 
 from dayu_widgets import dayu_theme
-from dayu_widgets.browser import MClickBrowserFileToolButton, MClickBrowserFolderToolButton
+from dayu_widgets.browser import MClickBrowserFileToolButton, MClickBrowserFolderToolButton, \
+    MClickSaveFileToolButton
 from dayu_widgets.mixin import focus_shadow_mixin
 from dayu_widgets.push_button import MPushButton
 from dayu_widgets.qt import QLineEdit, Signal, QHBoxLayout, Slot, QTextEdit, QApplication, Qt, \
@@ -22,7 +24,7 @@ from dayu_widgets.tool_button import MToolButton
 @focus_shadow_mixin
 class MLineEdit(QLineEdit):
     """MLineEdit"""
-    sig_delay_text_changed = Signal(basestring)
+    sig_delay_text_changed = Signal(six.string_types[0])
 
     def __init__(self, text='', parent=None):
         super(MLineEdit, self).__init__(text, parent)
@@ -169,9 +171,9 @@ class MLineEdit(QLineEdit):
         self.setPlaceholderText(self.tr('Error information will be here...'))
         return self
 
-    def search_engine(self):
+    def search_engine(self, text='Search'):
         """Add a MPushButton to suffix for MLineEdit"""
-        _suffix_button = MPushButton(text='Search').primary()
+        _suffix_button = MPushButton(text=text).primary()
         _suffix_button.clicked.connect(self.returnPressed)
         _suffix_button.setFixedWidth(100)
         self.set_suffix_widget(_suffix_button)
@@ -186,6 +188,16 @@ class MLineEdit(QLineEdit):
         self.textChanged.connect(_suffix_button.set_dayu_path)
         self.set_suffix_widget(_suffix_button)
         self.setPlaceholderText(self.tr('Click button to browser files'))
+        return self
+
+    def save_file(self, filters=None):
+        """Add a MClickSaveFileToolButton for MLineEdit to set save file"""
+        _suffix_button = MClickSaveFileToolButton()
+        _suffix_button.sig_file_changed.connect(self.setText)
+        _suffix_button.set_dayu_filters(filters or [])
+        self.textChanged.connect(_suffix_button.set_dayu_path)
+        self.set_suffix_widget(_suffix_button)
+        self.setPlaceholderText(self.tr('Click button to set save file'))
         return self
 
     def folder(self):
@@ -220,4 +232,9 @@ class MLineEdit(QLineEdit):
     def tiny(self):
         """Set MLineEdit to tiny size"""
         self.set_dayu_size(dayu_theme.tiny)
+        return self
+
+    def password(self):
+        """Set MLineEdit to password echo mode"""
+        self.setEchoMode(QLineEdit.Password)
         return self

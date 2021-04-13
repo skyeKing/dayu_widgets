@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ###################################################################
 # Author: Mu yanru
@@ -6,17 +5,12 @@
 # Email : muyanru345@163.com
 ###################################################################
 
-try:
-    from PySide2.QtCore import *
-    from PySide2.QtGui import *
-    from PySide2.QtWidgets import *
-    from PySide2.QtSvg import *
-except ImportError:
-    from PySide.QtCore import *
-    from PySide.QtGui import *
-    from PySide.QtSvg import *
+import six
 
-
+from Qt.QtCore import *
+from Qt.QtGui import *
+from Qt.QtWidgets import *
+from Qt.QtSvg import QSvgRenderer
 class MCacheDict(object):
     _render = QSvgRenderer()
 
@@ -30,11 +24,11 @@ class MCacheDict(object):
         replace_color = replace_color or dayu_theme.icon_color
         if (self.cls is QIcon) and (replace_color is None):
             return QIcon(svg_path)
-        with open(svg_path, 'r+') as f:
+        with open(svg_path, 'r') as f:
             data_content = f.read()
             if replace_color is not None:
                 data_content = data_content.replace('#555555', replace_color)
-            self._render.load(QByteArray(data_content))
+            self._render.load(QByteArray(six.b(data_content)))
             pix = QPixmap(128, 128)
             pix.fill(Qt.transparent)
             painter = QPainter(pix)

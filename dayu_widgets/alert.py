@@ -8,6 +8,7 @@
 """
 MAlert class.
 """
+import six
 import functools
 
 from dayu_widgets.avatar import MAvatar
@@ -32,7 +33,7 @@ class MAlert(QWidget):
     WarningType = 'warning'
     ErrorType = 'error'
 
-    def __init__(self, text='', parent=None, flags=0):
+    def __init__(self, text='', parent=None, flags=Qt.Widget):
         super(MAlert, self).__init__(parent, flags)
         self.setAttribute(Qt.WA_StyledBackground)
         self._icon_label = MAvatar()
@@ -51,15 +52,15 @@ class MAlert(QWidget):
         self.setLayout(self._main_lay)
 
         self.set_show_icon(True)
-        self.set_closeable(False)
+        self.set_closable(False)
         self._dayu_type = None
         self._dayu_text = None
         self.set_dayu_type(MAlert.InfoType)
         self.set_dayu_text(text)
 
-    def set_closeable(self, closeable):
+    def set_closable(self, closable):
         """Display the close icon button or not."""
-        self._close_button.setVisible(closeable)
+        self._close_button.setVisible(closable)
 
     def set_show_icon(self, show_icon):
         """Display the information type icon or not."""
@@ -71,7 +72,7 @@ class MAlert(QWidget):
 
     def set_dayu_text(self, value):
         """Set the feedback content."""
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             self._dayu_text = value
         else:
             raise TypeError("Input argument 'value' should be string type, "
@@ -102,11 +103,11 @@ class MAlert(QWidget):
     def get_dayu_text(self):
         """
         Get MAlert feedback message.
-        :return: basestring
+        :return: six.string_types
         """
         return self._dayu_text
 
-    dayu_text = Property(unicode, get_dayu_text, set_dayu_text)
+    dayu_text = Property(six.text_type, get_dayu_text, set_dayu_text)
     dayu_type = Property(str, get_dayu_type, set_dayu_type)
 
     def info(self):
@@ -131,5 +132,5 @@ class MAlert(QWidget):
 
     def closable(self):
         """Set MAlert closebale is True"""
-        self.set_closeable(True)
+        self.set_closable(True)
         return self

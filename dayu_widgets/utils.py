@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ###################################################################
 # Author: Mu yanru
@@ -8,6 +7,7 @@
 """
 Some helper functions for handling color and formatter.
 """
+import six
 
 import collections
 import datetime as dt
@@ -17,7 +17,7 @@ import os
 from singledispatch import singledispatch
 
 from dayu_widgets import DEFAULT_STATIC_FOLDER, CUSTOM_STATIC_FOLDERS
-from dayu_widgets.qt import QColor, QSortFilterProxyModel, QModelIndex, QFont, MIcon
+from dayu_widgets.qt import QColor, QSortFilterProxyModel, QModelIndex, QFont, MIcon, QIcon
 
 ItemViewMenuEvent = collections.namedtuple('ItemViewMenuEvent', ['view', 'selection', 'extra'])
 
@@ -30,8 +30,8 @@ def get_static_file(path):
     :param path: file name
     :return: if input file found, return the full path, else return None
     """
-    if not isinstance(path, basestring):
-        raise TypeError("Input argument 'path' should be basestring type, "
+    if not isinstance(path, six.string_types):
+        raise TypeError("Input argument 'path' should be six.string_types type, "
                         "but get {}".format(type(path)))
     full_path = next((os.path.join(prefix, path)
                       for prefix in ['', DEFAULT_STATIC_FOLDER] + CUSTOM_STATIC_FOLDERS
@@ -42,7 +42,7 @@ def get_static_file(path):
     return None
 
 
-def from_list_to_nested_dict(input_arg, sep='/'):
+def from_list_to_nested_dict(input_arg, sep="/"):
     """
     A help function to convert the list of string to nested dict
     :param input_arg: a list/tuple/set of string
@@ -52,8 +52,8 @@ def from_list_to_nested_dict(input_arg, sep='/'):
     if not isinstance(input_arg, (list, tuple, set)):
         raise TypeError("Input argument 'input' should be list or tuple or set, "
                         "but get {}".format(type(input_arg)))
-    if not isinstance(sep, basestring):
-        raise TypeError("Input argument 'sep' should be basestring, "
+    if not isinstance(sep, six.string_types):
+        raise TypeError("Input argument 'sep' should be six.string_types, "
                         "but get {}".format(type(sep)))
 
     result = []
@@ -136,7 +136,7 @@ def generate_color(primary_color, index):
         return max((v_comp * 100 - brightness_step2 * i) / 100, 0.0)
 
     light = index <= 6
-    hsv_color = QColor(primary_color) if isinstance(primary_color, basestring) else primary_color
+    hsv_color = QColor(primary_color) if isinstance(primary_color, six.string_types) else primary_color
     index = light_color_count + 1 - index if light else index - light_color_count - 1
     return QColor.fromHsvF(
         _get_hue(hsv_color, index, light),
@@ -219,7 +219,7 @@ def display_formatter(input_other_type):
     Used for QAbstractItemModel data method for Qt.DisplayRole
     Format any input value to a string.
     :param input_other_type: any type value
-    :return: basestring
+    :return: six.string_types
     """
     return str(input_other_type)  # this function never reached
 
@@ -248,7 +248,7 @@ def _(input_str):
     # return obj.decode()
 
 
-@display_formatter.register(unicode)
+@display_formatter.register(six.text_type)
 def _(input_unicode):
     return input_unicode
 
@@ -260,7 +260,9 @@ def _(input_none):
 
 @display_formatter.register(int)
 def _(input_int):
-    return str(input_int)
+    # return str(input_int)
+    # 直接返回 int，不影响该列的排序
+    return input_int
 
 
 @display_formatter.register(float)
@@ -282,7 +284,7 @@ def _(input_datetime):
     return input_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def font_formatter(underline=False, bold=False):
+def font_formatter(setting_dict):
     """
     Used for QAbstractItemModel data method for Qt.FontRole
     :param underline: font style underline
@@ -290,8 +292,8 @@ def font_formatter(underline=False, bold=False):
     :return: a QFont instance with given style
     """
     _font = QFont()
-    _font.setUnderline(underline)
-    _font.setBold(bold)
+    _font.setUnderline(setting_dict.get('underline') or False)
+    _font.setBold(setting_dict.get('bold') or False)
     return _font
 
 
@@ -314,6 +316,11 @@ def _(input_dict):
     return icon_formatter(path)
 
 
+@icon_formatter.register(QIcon)
+def _(input_dict):
+    return input_dict
+
+
 @icon_formatter.register(object)
 def _(input_object):
     attr_list = ['icon']
@@ -321,7 +328,7 @@ def _(input_object):
     return icon_formatter(path)
 
 
-@icon_formatter.register(basestring)
+@icon_formatter.register(str)
 def _(input_string):
     return MIcon(input_string)
 

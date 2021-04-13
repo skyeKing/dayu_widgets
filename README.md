@@ -4,6 +4,11 @@ Components for PySide
 
 主要参考了 [AntDesign](https://ant.design/) 组件库，其他参考了 [iView](https://www.iviewui.com/) 组件库，微信基础组件。
 
+更多在此基础上的组件插件：
+
+* [dayu_widgets_tag](https://github.com/muyr/dayu_widgets_tag):  [中文](https://muyr.github.io/dayu_widgets_tag/#/zh-cn/) | [EN](https://muyr.github.io/dayu_widgets_tag/#/)
+* [dayu_widgets_log](https://github.com/muyr/dayu_widgets_log):  [中文](https://muyr.github.io/dayu_widgets_log/#/zh-cn/) | [EN](https://muyr.github.io/dayu_widgets_log/#/)
+* [dayu_widgets_overlay](https://github.com/FXTD-ODYSSEY/dayu_widgets_overlay)
 
 提供**亮色(light)** 和 **暗色(dark)** 两种主题，每种主题可以设置主题颜色。
 以下截图以：
@@ -84,13 +89,13 @@ Components for PySide
 
 
 ### MCarousel <- QGraphicsView
-![pageres](screenshots/carousel_light.png)![pageres](screenshots/carousel_dark.png)
+![pageres](screenshots/carousel_light.gif)![pageres](screenshots/carousel_dark.gif)
 
 ### MCard <- QWidget
 ![pageres](screenshots/card_light.png)![pageres](screenshots/card_dark.png)
 
 ### MCollapse <- QWidget
-![pageres](screenshots/collapse_light.png)![pageres](screenshots/collapse_dark.png)
+![pageres](screenshots/collapse_light.gif)![pageres](screenshots/collapse_dark.gif)
 
 ### MLineTabWidget <- QWidget
 ![pageres](screenshots/line_tab_widget_light.gif)![pageres](screenshots/line_tab_widget_dark.gif)
@@ -114,7 +119,7 @@ Components for PySide
 ![pageres](screenshots/message_light.gif)![pageres](screenshots/message_dark.gif)
 
 ### MProgressBar <- QProgressBar
-![pageres](screenshots/progress_bar_light.png)![pageres](screenshots/progress_bar_dark.png)
+![pageres](screenshots/progressbar_light.gif)![pageres](screenshots/progressbar_dark.gif)
 
 ### MProgressCircle <- QProgressBar
 ![pageres](screenshots/progress_circle_light.png)![pageres](screenshots/progress_circle_dark.png)
